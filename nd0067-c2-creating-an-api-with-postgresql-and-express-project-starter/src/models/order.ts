@@ -35,8 +35,9 @@ export class OrderStore {
     try {
       const sql = 'INSERT INTO orders (user_id, status) VALUES ($1, $2) RETURNING *'
       const result = await conn.query(sql, [order.user_id, order.status])
-
       return result.rows[0]
+    } catch (err) {
+      throw new Error(`Could not create order for user ${order.user_id}. Error: ${err}`)
     } finally {
       conn.release()
     }
@@ -69,6 +70,8 @@ export class OrderStore {
         status: order.status,
         products: productsResult.rows
       }
+    } catch (err) {
+      throw new Error(`Could not find current order for user ${user_id}. Error: ${err}`)
     } finally {
       conn.release()
     }
@@ -80,8 +83,9 @@ export class OrderStore {
     try {
       const sql = 'INSERT INTO order_products (quantity, order_id, product_id) VALUES ($1, $2, $3) RETURNING *'
       const result = await conn.query(sql, [quantity, order_id, product_id])
-
       return result.rows[0]
+    } catch (err) {
+      throw new Error(`Could not add product ${product_id} to order ${order_id}. Error: ${err}`)
     } finally {
       conn.release()
     }

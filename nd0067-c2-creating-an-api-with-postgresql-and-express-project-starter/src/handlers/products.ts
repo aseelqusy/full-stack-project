@@ -4,25 +4,37 @@ import verifyAuthToken from '../middleware/auth'
 
 const store = new ProductStore()
 
-const index = async (_req: Request, res: Response) => {
-  const products = await store.index()
-  res.json(products)
-}
-
-const show = async (req: Request, res: Response) => {
-  const product = await store.show(req.params.id)
-  res.json(product)
-}
-
-const create = async (req: Request, res: Response) => {
-  const product: Product = {
-    name: req.body.name,
-    price: req.body.price,
-    category: req.body.category
+const index = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const products = await store.index()
+    res.json(products)
+  } catch (err) {
+    res.status(500).json(`Could not get products. Error: ${err}`)
   }
+}
 
-  const newProduct = await store.create(product)
-  res.json(newProduct)
+const show = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product = await store.show(req.params.id)
+    res.json(product)
+  } catch (err) {
+    res.status(500).json(`Could not get product. Error: ${err}`)
+  }
+}
+
+const create = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product: Product = {
+      name: req.body.name,
+      price: req.body.price,
+      category: req.body.category
+    }
+
+    const newProduct = await store.create(product)
+    res.json(newProduct)
+  } catch (err) {
+    res.status(500).json(`Could not create product. Error: ${err}`)
+  }
 }
 
 const productRoutes = (app: express.Application) => {
